@@ -12,7 +12,7 @@ st.set_page_config(
 @st.cache_resource
 def load_my_model():
     model = tf.keras.models.load_model(
-        "profile_fake_detection_model.h5",
+        "profile_fake_detection_model.keras",
         compile=False
     )
     return model
