@@ -1,6 +1,6 @@
 import streamlit as st
 import tensorflow as tf
-model = tf.keras.models.load_model("profile_fake_detection_model.h5")
+model = tf.keras.models.load_model("profile_fake_detection_model.h5", compile=False)
 from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
