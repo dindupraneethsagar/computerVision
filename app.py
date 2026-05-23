@@ -3,18 +3,27 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
-st.set_page_config(
-    page_title="Profile Picture Analysis",
-    page_icon="🕵️",
-    layout="centered"
-)
+st.set_page_config(page_title="Profile Picture Analysis", page_icon="🕵️")
 
 @st.cache_resource
 def load_my_model():
-    model = tf.keras.models.load_model(
-        "profile_fake_detection_model.keras",
-        compile=False
+    base_model = tf.keras.applications.MobileNetV2(
+        weights="imagenet",
+        include_top=False,
+        input_shape=(224, 224, 3)
     )
+
+    base_model.trainable = False
+
+    x = base_model.output
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+    output = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+
+    model = tf.keras.Model(inputs=base_model.input, outputs=output)
+
+    model.load_weights("profile_model.weights.h5")
+
     return model
 
 model = load_my_model()
@@ -34,8 +43,7 @@ if uploaded_file is not None:
 
     img = img.resize((224, 224))
 
-    img_array = np.array(img)
-    img_array = img_array / 255.0
+    img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
     prediction = model.predict(img_array)[0][0]
